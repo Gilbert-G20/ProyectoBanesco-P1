@@ -34,6 +34,8 @@ ClrScr;
         Writeln('1.Cualquier monto escrito no puede superar las 10 cifras.');
         Writeln('2.Cuando salgas del menu principal, se borraran todos los datos, asegurate de hacer todo lo que quieras.');
         Writeln('3.La informacion que escribas puede ser personal. QUE NADIE MAS LA VEA!');
+        Writeln;
+        Writeln('Presione ENTER para continuar.');
         readln;
 
                 Begin {Registro del Cliente + dos clientes predeterminados}
@@ -295,9 +297,17 @@ ClrScr;
                                                  begin
                                                         if (cd <> Cliente[4].Cedula) then
                                                         begin
-                                                                ClrScr;
-                                                                Writeln('El Cliente que buscas no esta registrado en este banco.');
-                                                                readln;
+                                                                if cd = Cliente[3].Cedula then
+                                                                Begin
+                                                                 ClrScr;
+                                                                 Writeln('El numero de cedula que ingreso es suyo, o de un cliente que no esta registrado en este banco.');
+                                                                 readln;
+
+                                                                 assign(fichero, 'NuevoCliente.TXT');
+                                                                 append(fichero);
+                                                                 Writeln(fichero, 'Error en deposito de cliente.');
+                                                                 close(fichero);
+                                                                End;
                                                         end;
                                                  end;
                                         End;
@@ -309,6 +319,11 @@ ClrScr;
                                     ClrScr;
                                         Writeln('Operacion invalida. SALDO INSUFICIENTE!');
                                         readln;
+
+                                        assign(fichero, 'NuevoCliente.TXT');
+                                        append(fichero);
+                                        Writeln(fichero, 'Error en deposito. SALDO INSUFICIENTE!');
+                                        close(fichero);
                                     end;
 
                                     End;
@@ -325,8 +340,11 @@ ClrScr;
                                 begin
                                         Writeln('[', Cliente[4].Cedula, '] ---> ', Cliente[4].Apellido);
                                 end;
-
-                                readln;
+                            Readln;
+                                        assign(fichero, 'NuevoCliente.TXT');
+                                        append(fichero);
+                                        Writeln(fichero, 'Revision del directorio.');
+                                        close(fichero);
                             end;
 
                         4 : begin
@@ -341,10 +359,59 @@ ClrScr;
                             ClrScr;
                                 Writeln('Cedula: ');   Readln(Cliente[4].Cedula);
                                 readln;
+                                        if (Cliente[4].Cedula <> Cliente[1].Cedula) then
+                                        Begin
+                                                if (Cliente[4].Cedula <> Cliente[2].Cedula)then
+                                                Begin
+                                                        if (Cliente[4].Cedula <> Cliente[3].Cedula) then
+                                                        Begin
+                                                                ClrScr;
+                                                                Writeln('Registrado con exito! (Presione ENTER para continuar)');
+                                                                readln;
 
-                            ClrScr;
-                                Writeln('Registrado con exito! (Presione ENTER para continuar)');
-                                readln;
+                                                                assign(fichero, 'NuevoCliente.TXT');
+                                                                append(fichero);
+                                                                Writeln(fichero, 'Registro de cliente [', Cliente[4].Cedula,']');
+                                                                close(fichero);
+                                                        End;
+                                                End;
+                                        End;
+
+                                        if Cliente[4].Cedula = Cliente[3].Cedula then
+                                        Begin
+                                                ClrScr;
+                                                Writeln('ERROR! El numero de cedula que ingreso es suyo, o ya esta registrado.');
+                                                Readln;
+
+                                                assign(fichero, 'NuevoCliente.TXT');
+                                                append(fichero);
+                                                Writeln(fichero, 'Error en registro de cliente.');
+                                                close(fichero);
+                                        End;
+
+                                        if Cliente[4].Cedula = Cliente[2].Cedula then
+                                        Begin
+                                                ClrScr;
+                                                Writeln('ERROR! El numero de cedula que ingreso es suyo, o ya esta registrado.');
+                                                Readln;
+
+                                                assign(fichero, 'NuevoCliente.TXT');
+                                                append(fichero);
+                                                Writeln(fichero, 'Error en registro de cliente.');
+                                                close(fichero);
+                                        End;
+
+                                        if Cliente[4].Cedula = Cliente[1].Cedula then
+                                        Begin
+                                                ClrScr;
+                                                Writeln('ERROR! El numero de cedula que ingreso es suyo, o ya esta registrado.');
+                                                Readln;
+
+                                                assign(fichero, 'NuevoCliente.TXT');
+                                                append(fichero);
+                                                Writeln(fichero, 'Error en registro de cliente.');
+                                                close(fichero);
+                                        End;
                             end;
 
                         5 : begin
@@ -374,6 +441,10 @@ ClrScr;
                             close(fichero);
                             readln;
 
+                            assign(fichero, 'NuevoCliente.TXT');
+                            append(fichero);
+                            Writeln(fichero, 'Revision del historial de operaciones.');
+                            close(fichero);
                             end;
 
                         7 : Exit;
