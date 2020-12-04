@@ -1,21 +1,21 @@
 {Programa para Emular el Funcionamiento de un Cajero Automatico}
 Program CajeroBanesco;
-Uses crt;
+Uses sysutils, crt;
 Type
         RegistroCliente = Record
         Cedula, Saldo       :LongInt;
         Nombre, Apellido    :String;
         End;
 
-        ReCliente = array[1..4] of RegistroCliente;
+        ReCliente = array[1..10] of RegistroCliente;
 Var
         Cliente   :ReCliente;
-        opt, i    :Integer;
+        opt,i,c,a :Integer;
         dep, cd   :LongInt;
         fichero   :text;
         linea     :String;
-Begin
-{Inicio del cajero}
+
+Begin {Inicio del cajero}
 ClrScr;
         textBackground(green);
         textColor(yellow);
@@ -32,200 +32,234 @@ ClrScr;
 ClrScr;
         Writeln('--RECOMENDACIONES--');
         Writeln('1.Cualquier monto escrito no puede superar las 10 cifras.');
-        Writeln('2.Cuando salgas del menu principal, se borraran todos los datos, asegurate de hacer todo lo que quieras.');
-        Writeln('3.La informacion que escribas puede ser personal. QUE NADIE MAS LA VEA!');
+        Writeln('2.El cajero tiene un limite de 50 operaciones, luego se cerrara automaticamente.');
+        Writeln('3.Cuando el cajero cierre, se borraran todos los datos, asegurate de hacer todo lo que quieras.');
+        Writeln('4.El cajero soporta un maximo de 10 clientes, pero necesita al menos 2 para funcionar.');
+        Writeln('5.La informacion que escribas puede ser personal. QUE NADIE MAS LA VEA!');
         Writeln;
         Writeln('Presione ENTER para continuar.');
         readln;
+Begin {Registro de cliente}
+Repeat
+ClrScr;
+        Writeln('Ingrese el numero de clientes que se van a registrar: ');
+        readln(c);
 
-                Begin {Registro del Cliente + dos clientes predeterminados}
-
-                With Cliente[1] do
+                if c < 2 then
                 Begin
-                        Cedula   := 30424655;
-                        Nombre   := 'Penelope';
-                        Apellido := 'Ody';
-                        Saldo    := 100000;
-                end;
-
-                With Cliente[2] do
-                Begin
-                        Cedula   := 15407077;
-                        Nombre   := 'Haruki';
-                        Apellido := 'Murakami';
-                        Saldo    := 750000;
-                end;
-
-                ClrScr;
-                Writeln('Por favor, ingrese los datos solicitados a continuacion para registrarse.');
-
-                Writeln('Cedula: ');            Readln(Cliente[3].Cedula);
-                ClrScr;
-
-                Writeln('Nombre: ');            Readln(Cliente[3].Nombre);
-                ClrScr;
-
-                Writeln('Apellido: ');          Readln(Cliente[3].Apellido);
-                ClrScr;
-
-                Writeln('Deposito incial: ');   Readln(Cliente[3].Saldo);
-                ClrScr;
-
-                assign(fichero, 'NuevoCliente.TXT');
-                rewrite(fichero);
-                Writeln(fichero,'Cedula: ', Cliente[3].Cedula);
-                Writeln(fichero,'Nombre: ', Cliente[3].Nombre);
-                Writeln(fichero,'Apellido: ', Cliente[3].Apellido);
-                Writeln(fichero,'Saldo inicial: ', Cliente[3].Saldo, ' Bs.');
-                Close(fichero);
-
-                textBackground(green);
-                textColor(yellow);
-                Writeln('C.I: ', Cliente[3].Cedula);
-                Writeln(Cliente[3].Nombre);
-                Writeln(Cliente[3].Apellido);
-                Writeln(Cliente[3].Saldo,' Bs.');
-                Writeln;
-
-                textBackground(black);
-                textColor(white);
-                Writeln('Ha sido registrado con exito, presione ENTER para continuar');
-                Readln;
+                Writeln('El cajero requiere, al menos, 2 clientes para funcionar. Presiona ENTER para regresar.');
+                readln;
                 End;
 
-{Menu de operaciones}
-        Begin
-        Repeat
-        ClrScr;
-                Writeln('------------------Menu principal---------------------');
-                Writeln('Escriba el numero de la operacion que va a realizar y presione ENTER.');
-                Writeln('Retirar                           ---> 1');
-                Writeln('Depositar                         ---> 2');
-                Writeln('Directorio                        ---> 3');
-                Writeln('Agregar al directorio             ---> 4');
-                Writeln('Consultar Saldo                   ---> 5');
-                Writeln('Mostrar historial de operaciones  ---> 6');
-                Writeln('Salir                             ---> 7');
-                Readln(opt);
+                if c > 10 then
+                Begin
+                Writeln('El cajero tiene un limite de 10 clientes. Presiona ENTER para regresar.');
+                readln;
+                End;
 
-                assign(fichero, 'NuevoCliente.TXT');
-                append(fichero);
-                writeln(fichero,'---------------');
-                close(fichero);
+Until (c > 1) and (c < 11);
+End;
+    For i:= 1 to c do
+    Begin
+                With Cliente[i] do
+                Begin
+                ClrScr;
+
+                        Writeln('Por favor, ingrese los datos solicitados a continuacion para registrarse.');
+
+                        Writeln('Cedula: ');            Readln(Cedula);
+                        ClrScr;
+
+                        Writeln('Nombre: ');            Readln(Nombre);
+                        ClrScr;
+
+                        Writeln('Apellido: ');          Readln(Apellido);
+                        ClrScr;
+
+                        Writeln('Deposito incial: ');   Readln(Saldo);
+                        ClrScr;
+
+                        textBackground(green);
+                        textColor(yellow);
+                        Writeln('C.I: ', Cedula);
+                        Writeln('Nombre: ', Nombre);
+                        Writeln('Apellido: ', Apellido);
+                        Writeln('Saldo inicial: ', Saldo,' Bs.');
+                        Writeln;
+
+                        textBackground(black);
+                        textColor(white);
+                        Writeln('El cliente #', i,' a sido registrado con exito, presione ENTER para continuar');
+                        Readln;
+                End;
+    End;
+
+Begin {Menu de operaciones}
+
+        Assign(fichero, 'Operaciones.TXT');
+        Rewrite(fichero);
+        Close(fichero);
+Begin
+Repeat
+ClrScr;
+ a:=a+0;
+        Writeln('------------------Menu principal---------------------');
+        Writeln('-------------(Operaciones realizadas: ' ,a,')--------------');
+        Writeln('Escriba el numero de la operacion que va a realizar y presione ENTER.');
+        Writeln('Retirar                           ---> 1');
+        Writeln('Depositar                         ---> 2');
+        Writeln('Consultar Saldo                   ---> 3');
+        Writeln('Mostrar historial de operaciones  ---> 4');
+        Writeln('Salir                             ---> 5');
+        Readln(opt);
+
+        Assign(fichero, 'Operaciones.TXT');
+        append(fichero);
+        Writeln(fichero,'---------------');
+        Close(fichero);
 
                 Case opt of
-                        1 : begin
+                        1 : Begin
                             ClrScr;
-                            Writeln('Seleccione la cantidad que va a retirar y presione ENTER.');
-                            Writeln('1000 bs. ---> 1');    Writeln('2000 bs. ---> 2');
-                            Writeln('10000 bs. --> 3');    Writeln('20000 bs. --> 4');
-                            Writeln('50000 bs. --> 5');
-                            Readln(i);
+                                Writeln('Escriba el numero de la cuenta desde donde realizara el retiro y presione ENTER. ');
 
-                               Case i of
-                                1 : begin
-                                    ClrScr;
-
-                                    Cliente[3].Saldo := Cliente[3].Saldo-1000;
-
-                                    Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    Readln;
-
-                                    assign(fichero, 'NuevoCliente.TXT');
-                                    append(fichero);
-                                    Writeln(fichero, 'Retiro de: 1000 Bs.');
-                                    Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    close(fichero);
-
-                                    end;
-                                2 : begin
-                                    ClrScr;
-
-                                    Cliente[3].Saldo := Cliente[3].Saldo-2000;
-
-                                    Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    readln;
-
-                                    assign(fichero, 'NuevoCliente.TXT');
-                                    append(fichero);
-                                    Writeln(fichero, 'Retiro de: 2000 Bs.');
-                                    Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    close(fichero);
-
-                                    end;
-                                3 : begin
-                                    ClrScr;
-
-                                    Cliente[3].Saldo := Cliente[3].Saldo-10000;
-
-                                    Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    readln;
-
-                                    assign(fichero, 'NuevoCliente.TXT');
-                                    append(fichero);
-                                    Writeln(fichero, 'Retiro de: 10000 Bs.');
-                                    Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    close(fichero);
-
-                                    end;
-                                4 : begin
-                                    ClrScr;
-
-                                    Cliente[3].Saldo := Cliente[3].Saldo-20000;
-
-                                    Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    Readln;
-
-                                    assign(fichero, 'NuevoCliente.TXT');
-                                    append(fichero);
-                                    Writeln(fichero, 'Retiro de: 20000 Bs.');
-                                    Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    close(fichero);
-
-                                    end;
-                                5 : begin
-                                    ClrScr;
-
-                                    Cliente[3].Saldo := Cliente[3].Saldo-50000;
-
-                                    Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    Readln;
-
-                                    assign(fichero, 'NuevoCliente.TXT');
-                                    append(fichero);
-                                    Writeln(fichero, 'Retiro de: 50000 Bs.');
-                                    Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                    close(fichero);
-
-                                    end;
+                                For i:=1 to c do
+                                Begin
+                                Writeln('[', Cliente[i].cedula,'] ---> ', i);
                                 End;
-                            Readln;
-                            end;
 
-                        2 : begin
+                                read(i);
+
+                            With Cliente[i] do
+                            Begin
                             ClrScr;
-                            Writeln('Seleccione el tipo de deposito a reaalizar y presione ENTER.');
-                            Writeln('Cuenta Propia ---> 1');        Writeln('Otra Cuenta -----> 2');
-                            Readln(i);
+                                Writeln('Seleccione la cantidad que va a retirar y presione ENTER.');
+                                Writeln('1000 bs. ---> 1');    Writeln('2000 bs. ---> 2');
+                                Writeln('10000 bs. --> 3');    Writeln('20000 bs. --> 4');
+                                Writeln('50000 bs. --> 5');
+                                Readln(opt);
 
-                               Case i of
+                                        Case opt of
+                                         1 : begin
+                                             ClrScr;
+
+                                             Saldo := Saldo-1000;
+
+                                             Writeln('Su saldo actual es: ', Saldo, ' Bs.');
+                                             Readln;
+
+                                             assign(fichero, 'Operaciones.TXT');
+                                             append(fichero);
+                                             Writeln(fichero,'Cuenta utilizada: [', Cedula, ']');
+                                             Writeln(fichero, 'Retiro de: 1000 Bs.');
+                                             Writeln(fichero, 'Su saldo actual es: ', Saldo, ' Bs.');
+                                             close(fichero);
+                                             a := a+1;
+                                             end;
+                                         2 : begin
+                                             ClrScr;
+
+                                             Saldo := Saldo-2000;
+
+                                             Writeln('Su saldo actual es: ', Saldo, ' Bs.');
+                                             readln;
+
+                                             assign(fichero, 'Operaciones.TXT');
+                                             append(fichero);
+                                             Writeln(fichero,'Cuenta utilizada: [', Cedula, ']');
+                                             Writeln(fichero, 'Retiro de: 2000 Bs.');
+                                             Writeln(fichero, 'Su saldo actual es: ', Saldo, ' Bs.');
+                                             close(fichero);
+                                             a := a+1;
+                                             end;
+                                         3 : begin
+                                             ClrScr;
+
+                                             Saldo := Saldo-10000;
+
+                                             Writeln('Su saldo actual es: ', Saldo, ' Bs.');
+                                             readln;
+
+                                             assign(fichero, 'Operaciones.TXT');
+                                             append(fichero);
+                                             Writeln(fichero,'Cuenta utilizada: [', Cedula, ']');
+                                             Writeln(fichero, 'Retiro de: 10000 Bs.');
+                                             Writeln(fichero, 'Su saldo actual es: ', Saldo, ' Bs.');
+                                             close(fichero);
+                                             a := a+1;
+                                             end;
+                                         4 : begin
+                                             ClrScr;
+
+                                             Saldo := Saldo-20000;
+
+                                             Writeln('Su saldo actual es: ', Saldo, ' Bs.');
+                                             Readln;
+
+                                             assign(fichero, 'Operaciones.TXT');
+                                             append(fichero);
+                                             Writeln(fichero,'Cuenta utilizada: [', Cedula, ']');
+                                             Writeln(fichero, 'Retiro de: 20000 Bs.');
+                                             Writeln(fichero, 'Su saldo actual es: ', Saldo, ' Bs.');
+                                             close(fichero);
+                                             a :=a+1;
+                                             end;
+                                         5 : begin
+                                             ClrScr;
+
+                                             Saldo := Saldo-50000;
+
+                                             Writeln('Su saldo actual es: ', Saldo, ' Bs.');
+                                             Readln;
+
+                                             assign(fichero, 'Operaciones.TXT');
+                                             append(fichero);
+                                             Writeln(fichero,'Cuenta utilizada: [', Cedula, ']');
+                                             Writeln(fichero, 'Retiro de: 50000 Bs.');
+                                             Writeln(fichero, 'Su saldo actual es: ', Saldo, ' Bs.');
+                                             close(fichero);
+                                             a := a+1;
+                                             end;
+                                             end;
+                            End;
+                           End;
+                        2 : Begin
+                            ClrScr;
+                                Writeln('Escriba el numero asignado a la cuenta desde donde realizara el deposito y presione ENTER. ');
+
+                                For i:=1 to c do
+                                Begin
+                                Writeln('[', Cliente[i].cedula,'] ---> ', i);
+                                End;
+
+                                read(i);
+
+                            With Cliente[i] do
+                            Begin
+                            ClrScr;
+                            Writeln('Seleccione el tipo de deposito a realizar y presione ENTER.');
+                            Writeln('Propia Cuenta ---> 1');       Writeln('Otra Cuenta -----> 2');
+                            Readln(opt);
+
+                               Case opt of
                                 1 : begin
                                     ClrScr;
                                     Writeln('Monto a depositar: ');
                                     readln(dep);
 
-                                    Cliente[3].Saldo := Cliente[3].Saldo+dep;
+                                    Saldo := Saldo+dep;
 
                                     ClrScr;
-                                    Writeln('Su saldo actual es: ', CLiente[3].Saldo, ' Bs.');
+                                    Writeln('Su saldo actual es: ', Saldo, ' Bs.');
                                     Readln;
 
-                                    assign(fichero, 'NuevoCliente.TXT');
+                                    assign(fichero, 'Operaciones.TXT');
                                     append(fichero);
-                                    Writeln(fichero, 'Deposito a Cuenta Propia de: ', dep,' Bs.');
-                                    Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
+                                    Writeln(fichero, 'Cuenta utilizada: [', cedula, ']');
+                                    Writeln(fichero, 'Deposito a Propia Cuenta de: ', dep,' Bs.');
+                                    Writeln(fichero, 'Su saldo actual es: ', Saldo, ' Bs.');
                                     close(fichero);
-
+                                    a :=a+1;
                                     end;
 
                                 2 : begin
@@ -233,205 +267,87 @@ ClrScr;
                                     Writeln('Monto a depositar: ');
                                     readln(dep);
 
-                                    if dep < Cliente[3].Saldo then
+                                    if dep > Saldo then
+                                        Begin
+                                        ClrScr;
+                                                Writeln('Transaccion fallida. SALDO INSUFICIENTE!.Presiona ENTER para continuar');
+                                                Readln;
+
+                                                assign(fichero, 'Operaciones.TXT');
+                                                append(fichero);
+                                                Writeln(fichero, 'Cuenta Utilizada: [', cedula,']');
+                                                Writeln(fichero, 'Error en operacion. SALDO INSUFICIENTE!');
+                                                close(fichero);
+                                                a := a+1;
+                                        End;
+
+                                    if dep < Saldo then
                                     Begin
-                                    ClrScr;
-                                    Writeln('Numero de cedula del cliente al que va a depositar: ');
-                                    readln(cd);
+                                        ClrScr;
+                                        Writeln('Ingrese el numero asignado a la cuenta a la que se le depositara: ');
 
-                                        If cd = Cliente[1].Cedula then
+                                        For i:= 1 to c do
                                         Begin
-                                                ClrScr;
-                                                Writeln('OPERACION EXITOSA!');
-
-                                                Cliente[3].Saldo := Cliente[3].Saldo - dep;
-
-                                                Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                                Readln;
-
-                                                assign(fichero, 'NuevoCliente.TXT');
-                                                append(fichero);
-                                                Writeln(fichero, 'Deposito a Cuenta:[', Cliente[1].Cedula, '] De:', dep,' Bs.');
-                                                Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                                close(fichero);
+                                        Writeln('[', Cliente[i].cedula,'] ---> ', i);
                                         End;
 
-                                        If cd = Cliente[2].Cedula then
-                                        Begin
-                                                ClrScr;
-                                                Writeln('OPERACION EXITOSA!');
-
-                                                Cliente[3].Saldo := Cliente[3].Saldo - dep;
-
-                                                Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                                Readln;
-
-                                                assign(fichero, 'NuevoCliente.TXT');
-                                                append(fichero);
-                                                Writeln(fichero, 'Deposito a Cuenta:[', Cliente[2].Cedula, '] De:', dep,' Bs.');
-                                                Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                                close(fichero);
-                                        End;
-
-                                        If cd = Cliente[4].Cedula then
-                                        Begin
-                                                ClrScr;
-                                                Writeln('OPERACION EXITOSA!');
-
-                                                Cliente[3].Saldo := Cliente[3].Saldo - dep;
-
-                                                Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                                Readln;
-
-                                                assign(fichero, 'NuevoCliente.TXT');
-                                                append(fichero);
-                                                Writeln(fichero, 'Deposito a Cuenta:[', Cliente[4].Cedula, '] De:', dep,' Bs.');
-                                                Writeln(fichero, 'Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                                                close(fichero);
-                                        End;
-
-
-                                        if (cd <> Cliente[1].Cedula) then
-                                        Begin
-                                                 if (cd <> Cliente[2].Cedula) then
-                                                 begin
-                                                        if (cd <> Cliente[4].Cedula) then
-                                                        begin
-                                                                if cd = Cliente[3].Cedula then
-                                                                Begin
-                                                                 ClrScr;
-                                                                 Writeln('El numero de cedula que ingreso es suyo, o de un cliente que no esta registrado en este banco.');
-                                                                 readln;
-
-                                                                 assign(fichero, 'NuevoCliente.TXT');
-                                                                 append(fichero);
-                                                                 Writeln(fichero, 'Error en deposito de cliente.');
-                                                                 close(fichero);
-                                                                End;
-                                                        end;
-                                                 end;
-                                        End;
-
-                                    end;
-
-                                    if dep > Cliente[3].Saldo then
-                                    Begin
-                                    ClrScr;
-                                        Writeln('Operacion invalida. SALDO INSUFICIENTE!');
+                                        read(i);
                                         readln;
 
-                                        assign(fichero, 'NuevoCliente.TXT');
+                                        Cliente[i].Saldo := Cliente[i].Saldo+dep;
+                                        Saldo := Saldo-dep;
+
+                                        ClrScr;
+                                        Writeln('Transaccion exitosa!');
+                                        Writeln('Su saldo actual es: ', Saldo, ' Bs.');
+                                        readln;
+
+                                        assign(fichero, 'Operaciones.TXT');
                                         append(fichero);
-                                        Writeln(fichero, 'Error en deposito. SALDO INSUFICIENTE!');
+                                        Writeln(fichero, 'Cuenta utilizada: [', cedula, ']');
+                                        Writeln(fichero, 'Deposito a Cuenta: [', Cliente[i].Cedula,'] de: ', dep,' Bs.');
+                                        Writeln(fichero, 'Su saldo actual es: ', Saldo, ' Bs.');
                                         close(fichero);
+                                        a := a+1;
                                     end;
-
-                                    End;
+                                    end;
                                 end;
-                            end;
-
+                                end;
+                                end;
                         3 : begin
                             ClrScr;
-                                Writeln('Los clientes registrados en su directorio son: ');
-                                Writeln('[', Cliente[1].Cedula, '] ---> ', Cliente[1].Apellido);
-                                Writeln('[', Cliente[2].Cedula, '] ---> ', Cliente[2].Apellido);
+                                Writeln('Escriba el numero asignado a la cuenta que quiere consultar y presione ENTER. ');
 
-                                if Cliente[4].Cedula > 1 then
-                                begin
-                                        Writeln('[', Cliente[4].Cedula, '] ---> ', Cliente[4].Apellido);
-                                end;
+                                For i:=1 to c do
+                                Begin
+                                Writeln('[', Cliente[i].cedula,'] ---> ', i);
+                                End;
+
+                                read(i);
+                                readln;
+
+                            With Cliente[i] do
+                            begin
+                            ClrScr;
+                            Writeln('Su saldo actual es: ', Saldo, ' Bs.');
                             Readln;
-                                        assign(fichero, 'NuevoCliente.TXT');
-                                        append(fichero);
-                                        Writeln(fichero, 'Revision del directorio.');
-                                        close(fichero);
+
+                            assign(fichero, 'Operaciones.TXT');
+                            append(fichero);
+                            Writeln(fichero, 'Cuenta utilizada: [', cedula, ']');
+                            Writeln(fichero, 'Consulta de saldo actual: ', Saldo, ' Bs.');
+                            close(fichero);
+                            a := a+1;
                             end;
+
+                           readln;
+                           End;
 
                         4 : begin
                             ClrScr;
-                                Writeln('Nombre: ');   Readln(CLiente[4].Nombre);
-                                readln;
-
-                            ClrScr;
-                                Writeln('Apellido: '); Readln(CLiente[4].Apellido);
-                                readln;
-
-                            ClrScr;
-                                Writeln('Cedula: ');   Readln(Cliente[4].Cedula);
-                                readln;
-                                        if (Cliente[4].Cedula <> Cliente[1].Cedula) then
-                                        Begin
-                                                if (Cliente[4].Cedula <> Cliente[2].Cedula)then
-                                                Begin
-                                                        if (Cliente[4].Cedula <> Cliente[3].Cedula) then
-                                                        Begin
-                                                                ClrScr;
-                                                                Writeln('Registrado con exito! (Presione ENTER para continuar)');
-                                                                readln;
-
-                                                                assign(fichero, 'NuevoCliente.TXT');
-                                                                append(fichero);
-                                                                Writeln(fichero, 'Registro de cliente [', Cliente[4].Cedula,']');
-                                                                close(fichero);
-                                                        End;
-                                                End;
-                                        End;
-
-                                        if Cliente[4].Cedula = Cliente[3].Cedula then
-                                        Begin
-                                                ClrScr;
-                                                Writeln('ERROR! El numero de cedula que ingreso es suyo, o ya esta registrado.');
-                                                Readln;
-
-                                                assign(fichero, 'NuevoCliente.TXT');
-                                                append(fichero);
-                                                Writeln(fichero, 'Error en registro de cliente.');
-                                                close(fichero);
-                                        End;
-
-                                        if Cliente[4].Cedula = Cliente[2].Cedula then
-                                        Begin
-                                                ClrScr;
-                                                Writeln('ERROR! El numero de cedula que ingreso es suyo, o ya esta registrado.');
-                                                Readln;
-
-                                                assign(fichero, 'NuevoCliente.TXT');
-                                                append(fichero);
-                                                Writeln(fichero, 'Error en registro de cliente.');
-                                                close(fichero);
-                                        End;
-
-                                        if Cliente[4].Cedula = Cliente[1].Cedula then
-                                        Begin
-                                                ClrScr;
-                                                Writeln('ERROR! El numero de cedula que ingreso es suyo, o ya esta registrado.');
-                                                Readln;
-
-                                                assign(fichero, 'NuevoCliente.TXT');
-                                                append(fichero);
-                                                Writeln(fichero, 'Error en registro de cliente.');
-                                                close(fichero);
-                                        End;
-                            end;
-
-                        5 : begin
-                            ClrScr;
-                            Writeln('Su saldo actual es: ', Cliente[3].Saldo, ' Bs.');
-                            Readln;
-
-                            assign(fichero, 'NuevoCliente.TXT');
-                            append(fichero);
-                            Writeln(fichero, 'Consulta de saldo actual: ', Cliente[3].Saldo, ' Bs.');
-                            close(fichero);
-
-                            end;
-
-                        6 : begin
-                            ClrScr;
                             Writeln('//Historial de operaciones//');
-                            Readln;
 
-                            assign(fichero, 'NuevoCliente.TXT');
+                            assign(fichero, 'Operaciones.TXT');
                             reset(fichero);
                             While not eof(fichero) do
                             begin
@@ -441,20 +357,18 @@ ClrScr;
                             close(fichero);
                             readln;
 
-                            assign(fichero, 'NuevoCliente.TXT');
+                            assign(fichero, 'Operaciones.TXT');
                             append(fichero);
                             Writeln(fichero, 'Revision del historial de operaciones.');
                             close(fichero);
+                            a := a+1;
+                            end;
                             end;
 
-                        7 : Exit;
-                End;
-        Until opt=7;
-        End;
 
-Readln;
+
+Until (opt =5) or (a =50);
+
+End;
+End;
 End.
-
-
-
-
